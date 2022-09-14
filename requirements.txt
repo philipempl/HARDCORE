@@ -1,0 +1,8 @@
+pyshark
+netflow
+ipfix
+pymongo[srv]
+pm4py
+pyspark
+numpy
+pandas

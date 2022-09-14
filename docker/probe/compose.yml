@@ -1,0 +1,12 @@
+services:
+  probe:
+    container_name: mqtt-probe
+    image: test/probe
+    environment:
+      - INTERFACE=utun7
+      - COLLECTOR=127.0.0.1
+      - COLLECTOR_PORT=2055
+      - LOG_LEVEL=DEBUG
+    network_mode: "host"
+    restart: "always"
+    privileged: true

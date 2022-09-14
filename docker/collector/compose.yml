@@ -1,0 +1,19 @@
+services:
+  collector:
+    container_name: collector
+    image: test/collector:latest
+    depends_on:
+      - mongodb
+    environment:
+      - COLLECTOR=collector
+      - COLLECTOR_PORT=2055
+      - MONGO_URL=mongodb://mongodb:27017/
+    ports:
+      - "2055:2055"
+    restart: always
+  mongodb:
+    container_name: mongodb
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    restart: always

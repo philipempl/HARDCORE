@@ -1,0 +1,7 @@
+.git
+.gitignore
+.vscode
+*DockerFile*
+*docker-compose.yml*
+readme.md
+workspace.code-workspace
