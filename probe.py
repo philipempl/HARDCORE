@@ -4,6 +4,7 @@ Module for sniffing PCAP traffic, extract MQTT flows, and export them as IPFIX n
 
 import argparse
 import logging
+import threading
 import pyshark
 from modules.mqtt.flow_record import MqttRecord
 from modules.mqtt_probe.flow_table import FlowTable
@@ -15,7 +16,6 @@ formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(messag
 ch.setFormatter(formatter)
 logger.addHandler(ch)
 
-counter = 0
 
 class MqttProbe:
     """
@@ -35,13 +35,17 @@ class MqttProbe:
         logger.debug('Probing MQTT traffic in live capturing mode...')
         # capture packets
         self.__capture = pyshark.LiveCapture(interface=self.interface, bpf_filter=self.capture_filter)
-
+        
+        counter = 1
         for packet in self.__capture:
-            # get mqtt packet
-            mqtt_packet = self.__retrieve_mqtt_packet(packet)
-            # filter out non MQTT packets
-            if mqtt_packet is None:
-                continue
+            threading.Thread(name=f"packet{counter}", target=self.process_packet(packet)).start()
+            counter +=1
+
+    def process_packet(self, packet):
+        # get mqtt packet
+        mqtt_packet = self.__retrieve_mqtt_packet(packet)
+        # filter out non MQTT packets
+        if mqtt_packet is not None:
             # pcap to flow conversion
             self.__flow_table.process_flow(mqtt_packet)
 

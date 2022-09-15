@@ -26,6 +26,7 @@ class MqttIpfixExporter():
         self.port = port
         self.logger = logger
         self.counter = 0
+        self.qos= "qos0"
 
     def get_ipfix_template(self):
         """
@@ -74,17 +75,17 @@ class MqttIpfixExporter():
         # time1 = start_ns
         # time2 = datetime.now().timestamp()
        
-        file_name = f"evaluation/probe_10^{self.counter}.csv"
+        file_name = f"/root/evaluation/HARDCORE/evaluation/probe_{self.qos}_{self.counter}.csv"
         if flow.mqtt_src_client_id == "DIVIDER" and flow.mqtt_control_type== 1:
-            self.counter = self.counter + 1
-            file_name = f"evaluation/probe_10^{self.counter}.txt"
-            with open(file_name, 'w', newline='') as outcsv:
+            self.counter = self.counter + 10
+            file_name = f"/root/evaluation/HARDCORE/evaluation/probe_{self.qos}_{self.counter}.csv"
+            with open(file_name, 'w',newline='') as outcsv:
                 writer = csv.writer(outcsv)
                 writer.writerow(["client_send_time", "sniff_time", "export_time", "latency_client_sniff","cpu_percent","memory_percent"])
 
         if "temperature-sensor" in flow.mqtt_src_client_id and flow.mqtt_control_type== 3:
             latency = datetime.now() - datetime.strptime(flow.mqtt_correlation_data,'%Y-%m-%d %H:%M:%S.%f')
             fields = [datetime.strptime(flow.mqtt_correlation_data,'%Y-%m-%d %H:%M:%S.%f'),flow.flow_start_nanoseconds.strftime('%Y-%m-%d %H:%M:%S.%f'), datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'), latency, psutil.cpu_percent(),psutil.virtual_memory().percent]
-            with open(file_name, 'a') as f:
+            with open(file_name, 'a',newline='') as f:
                 writer = csv.writer(f)
                 writer.writerow(fields)
